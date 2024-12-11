@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Control</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #ccc;
+            border: none;
+            transition: background-color 0.3s;
+        }
+
+        button.on {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <h3>Lab3.1</h3>
+    <div class="button-container">
+        <p id="humidity">Humidity: 0%</p>
+        <p id="temperature">Temperature: 0°C</p>
+        <button id="pump">PUMP</button>
+    </div>
+
+    <div style="height: 50px;"></div>
+
+    <h3>Lab3.2</h3>
+    <input type="text" id="label" placeholder="Content">
+    <button id="logoutButton">Logout</button>
+    <script src = "index.js" type="module"></script>
+</body>
+
+
+</html>
