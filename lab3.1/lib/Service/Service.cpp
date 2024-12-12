@@ -41,6 +41,14 @@ void Service::getFirebaseData()
             if(jsonData.get(result, "isPumpOn") && result.type == "boolean"){
                 isPumpOn = result.boolValue;
             }
+
+            if(jsonData.get(result, "mode") && result.type == "string"){
+                mode = result.stringValue;
+            }
+
+            if(jsonData.get(result, "power") && result.type == "boolean"){
+                isPowerOn = result.boolValue;
+            }
         }
     }
     else
@@ -117,6 +125,36 @@ void Service::setTemperature(float temperature){
     jsonData.add("temperature", temperature);
     if(Firebase.RTDB.updateNode(&fbdo, streamPath.c_str(), &jsonData)){
         // Serial.println("Temperature is updated via firebase");
+    } else {
+        Serial.println(fbdo.errorReason());
+    }
+}
+
+void Service::setMode(String mode){
+    FirebaseJson jsonData;
+    jsonData.add("mode", mode);
+    if(Firebase.RTDB.updateNode(&fbdo, streamPath.c_str(), &jsonData)){
+        // Serial.println("Mode is updated via firebase");
+    } else {
+        Serial.println(fbdo.errorReason());
+    }
+}
+
+void Service::turnPowerOn(){
+    FirebaseJson jsonData;
+    jsonData.add("power", true);
+    if(Firebase.RTDB.updateNode(&fbdo, streamPath.c_str(), &jsonData)){
+        // Serial.println("Power is turned on via firebase");
+    } else {
+        Serial.println(fbdo.errorReason());
+    }
+}
+
+void Service::turnPowerOff(){
+    FirebaseJson jsonData;
+    jsonData.add("power", false);
+    if(Firebase.RTDB.updateNode(&fbdo, streamPath.c_str(), &jsonData)){
+        // Serial.println("Power is turned off via firebase");
     } else {
         Serial.println(fbdo.errorReason());
     }

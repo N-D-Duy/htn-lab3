@@ -48,3 +48,28 @@ void Controller::setTemperature(float temperature)
 {
     service.setTemperature(temperature);
 }
+
+String Controller::getMode()
+{
+    return service.mode;
+}
+
+void Controller::setMode(String mode)
+{
+    service.setMode(mode);
+}
+
+void Controller::turnPowerOn()
+{
+    service.turnPowerOn();
+}
+
+void Controller::turnPowerOff()
+{
+    service.turnPowerOff();
+}
+
+boolean Controller::isPowerOn()
+{
+    return service.isPowerOn;
+}

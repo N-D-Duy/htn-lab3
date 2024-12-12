@@ -12,9 +12,14 @@ public:
     void turnPumpOff();
     void setHumidity(float humidity);
     void setTemperature(float temperature);
+    void setMode(String mode);
     float humidity;
     float temperature;
+    String mode;
     boolean isPumpOn;
+    boolean isPowerOn;
+    void turnPowerOn();
+    void turnPowerOff();
 };
 
 #endif

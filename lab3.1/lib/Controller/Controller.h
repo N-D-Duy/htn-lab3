@@ -15,6 +15,11 @@ public:
     void setHumidity(float humidity);
     float getTemperature();
     void setTemperature(float temperature);
+    String getMode();
+    void setMode(String mode);
+    boolean isPowerOn();
+    void turnPowerOn();
+    void turnPowerOff();
     void streamData();
 private:
     Service service; 
