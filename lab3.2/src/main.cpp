@@ -1,31 +1,60 @@
 #include <Wire.h>
-#include <LiquidCrystal_I2C.h>
 #include <Arduino.h>
 #include "Controller.h"
-#include <string.h>
+#include <MD_Parola.h>
+#include <MD_MAX72xx.h>
+#include <SPI.h>
 
-LiquidCrystal_I2C LCD(0x27, 16, 2);
+
+#define HARDWARE_TYPE MD_MAX72XX::PAROLA_HW
+#define MAX_DEVICES 4
+#define CS_PIN 21
+#define CLK_PIN 13
+#define DATA_PIN 11
+
+#define BUF_SIZE 75
+uint8_t scrollSpeed = 75;
+textEffect_t scrollEffect = PA_SCROLL_LEFT;
+textPosition_t scrollAlign = PA_LEFT;
+uint16_t scrollPause = 0;
+
+char curMessage[BUF_SIZE] = { "" };
+char newMessage[BUF_SIZE] = { "" };
+bool newMessageAvailable = false;
+
+MD_Parola ledMatrix = MD_Parola(HARDWARE_TYPE, CS_PIN, MAX_DEVICES);
 Controller* controller;
-String* currentText = nullptr;
-TaskHandle_t lcdTaskHandle;
+TaskHandle_t ledTaskHandle;
 
 void displayTextTask(void* parameter);
 
 void setup()
 {
     Serial.begin(115200);
-    LCD.init();
-    LCD.backlight();
+
     controller = new Controller();
     controller->setup();
-    
+
+    ledMatrix.begin();
+    ledMatrix.setIntensity(5);
+    ledMatrix.displayClear();
+
+    ledMatrix.displayText(
+        curMessage, 
+        scrollAlign, 
+        scrollSpeed, 
+        scrollPause, 
+        scrollEffect, 
+        scrollEffect
+    );
+
     xTaskCreatePinnedToCore(
         displayTextTask,
-        "LCD Display Task",
+        "LED Display Task",
         4096,
         NULL,
         1,
-        &lcdTaskHandle,
+        &ledTaskHandle,
         1
     );
 }
@@ -41,54 +70,22 @@ void displayTextTask(void* parameter)
     while (true)
     {
         String text = controller->getText();
-        
-        if (!text.isEmpty() && text != (currentText ? *currentText : ""))
+        if (!text.isEmpty())
         {
-            LCD.clear();
-            
-            if (text.length() > 16)
-            {
-                int textLength = text.length();
-                int scrollOffset = 0;
-                
-                while (true)
-                {
-                    String displayText;
-                    if (scrollOffset + 16 <= textLength)
-                    {
-                        displayText = text.substring(scrollOffset, scrollOffset + 16);
-                    }
-                    else
-                    {
-                        int remainingChars = textLength - scrollOffset;
-                        displayText = text.substring(scrollOffset) + 
-                                      text.substring(0, 16 - remainingChars);
-                    }
-                    
-                    LCD.setCursor(0, 0);
-                    LCD.print(displayText);
-                    
-                    vTaskDelay(300 / portTICK_PERIOD_MS);
-                    
-                    
-                    scrollOffset = (scrollOffset + 1) % textLength;
-                    
-                    
-                    String currentTextCheck = controller->getText();
-                    if (currentTextCheck != text)
-                        break;
-                }
-            }
-            else
-            {
-                LCD.print(text);
-            }
-            
-            // Update current text
-            if (currentText) delete currentText;
-            currentText = new String(text);
+            text.toCharArray(newMessage, BUF_SIZE);
+            newMessageAvailable = true;
         }
-        
+        if (ledMatrix.displayAnimate())
+        {
+            if (newMessageAvailable)
+            {
+                strcpy(curMessage, newMessage);
+                newMessageAvailable = false;
+            }
+
+            ledMatrix.displayReset();
+        }
+
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }

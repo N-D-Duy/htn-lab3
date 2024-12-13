@@ -7,6 +7,8 @@ const database = getDatabase(app);
 const auth = getAuth(app);
 
 var currentText = "";
+var currentMode = "";
+const location = "lab3-1";
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -23,14 +25,12 @@ async function getDataAndUpdateHolder() {
         const data = snapshot.val();
 
         if (data) {
-            //update lab3.2
             const labelHolder = document.getElementById('label');
             if (labelHolder) {
                 currentText = data.lab3;
                 labelHolder.value = data.lab3;
             }
 
-            // update lab3-1
             const lab31 = data['lab3-1'];
             if (lab31) {
                 const humidityHolder = document.getElementById('humidity');
@@ -46,6 +46,18 @@ async function getDataAndUpdateHolder() {
                 if (pumpHolder) {
                     pumpHolder.classList.toggle('on', pumpData);
                 }
+
+                const mode = document.getElementById('mode');
+                if(mode) {
+                    mode.innerText = "Mode: " + lab31.mode;
+                    currentMode = lab31.mode;
+                }
+
+                const power = document.getElementById('power');
+                const powerData = lab31.power === true;
+                if(power){
+                    power.classList.toggle('on', powerData);
+                }
             }
         }
     });
@@ -53,7 +65,7 @@ async function getDataAndUpdateHolder() {
 
 async function setupButton() {
     const button = document.getElementById('pump');
-    button.addEventListener('click', (event) => {
+    button.addEventListener('click', (event) =>{
         let state = false;
 
         if (button.classList.contains('on')) {
@@ -63,15 +75,54 @@ async function setupButton() {
             state = true;
             button.classList.add('on');
         }
-        const location = "lab3-1";
+        
         const deviceType = "isPumpOn";
+        if(currentMode==="AUTO" && state===true){
+            currentMode="MANUAL";
+        } else if(currentMode==="MANUAL" && state===false){
+            currentMode="AUTO";
+        }
+        console.log(currentMode);
+        console.log(state);
+        updatePumpMode(location, currentMode);
         updateButton(location, deviceType, state);
+        
     });
+
+    const power = document.getElementById('power');
+    power.addEventListener('click', (event) =>{
+        let state = false;
+        if(power.classList.contains('on')){
+            state = false;
+            power.classList.remove('on');
+        } else {
+            state = true;
+            power.classList.add('on');
+        }
+        updatePower(location, state);
+    });
+}
+
+async function updatePower(location, state) {
+    const deviceRef = ref(database, `${location}/power`);
+    await updateButton(location, "isPumpOn", false);
+    await updatePumpMode(location, "AUTO");
+    await set(deviceRef, state);
 }
 
 async function updateButton(location, deviceType, state) {
     const deviceRef = ref(database, `${location}/${deviceType}`);
     await set(deviceRef, state);
+}
+
+async function updatePumpMode(location, mode) {
+    const deviceRef = ref(database, `${location}/mode`);
+    if(mode!=null){
+        console.log(mode);
+        await set(deviceRef, mode);        
+    } else{
+        console.log("Mode is null");
+    }
 }
 
 async function logout() {

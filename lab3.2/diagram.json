@@ -1,24 +1,25 @@
 {
   "version": 1,
-  "author": "Anonymous maker",
+  "author": "duyy",
   "editor": "wokwi",
   "parts": [
-    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": -76.8, "left": 43.24, "attrs": {} },
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 105.6, "left": -62.36, "attrs": {} },
     {
-      "type": "wokwi-lcd1602",
-      "id": "lcd1",
-      "top": -70.4,
-      "left": 188,
-      "attrs": { "pins": "i2c" }
+      "type": "wokwi-max7219-matrix",
+      "id": "matrix1",
+      "top": -9,
+      "left": -107.76,
+      "attrs": { "chain": "4" }
     }
   ],
   "connections": [
     [ "esp:TX", "$serialMonitor:RX", "", [] ],
     [ "esp:RX", "$serialMonitor:TX", "", [] ],
-    [ "lcd1:SDA", "esp:21", "green", [ "v-4.49", "h-28.8", "v23.89" ] ],
-    [ "lcd1:GND", "esp:GND.2", "black", [ "h-16.67", "v162.78" ] ],
-    [ "lcd1:VCC", "esp:3V3", "red", [ "h-9.6", "v-57.5", "h-134.55" ] ],
-    [ "lcd1:SCL", "esp:22", "purple", [ "h-19.2", "v-18.9" ] ]
+    [ "esp:GND.2", "matrix1:GND", "black", [ "v-9.6", "h240", "v-105.6", "h-48" ] ],
+    [ "esp:3V3", "matrix1:V+", "red", [ "h-76.65", "v-153.6", "h393.6", "v19.2" ] ],
+    [ "esp:18", "matrix1:CLK", "green", [ "h268.8", "v-163.2" ] ],
+    [ "esp:21", "matrix1:CS", "green", [ "h297.6", "v-144", "h-9.6" ] ],
+    [ "esp:23", "matrix1:DIN", "green", [ "h326.4", "v-115.2" ] ]
   ],
   "dependencies": {}
 }
